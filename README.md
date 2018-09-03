@@ -26,16 +26,22 @@ vendor/
 ## Install
 
 Via Composer
-
+For dev
 ``` bash
-$ composer require stanislavqq/iikoapi
+$ composer require --dev stanislavqq/iikoapi
 ```
 
 ## Usage
 
 ``` php
-$skeleton = new stanislavqq\iikoapi();
-echo $skeleton->echoPhrase('Hello, League!');
+use stanislavqq\iikoapi\IikoApi;
+
+$iikoApi = new IikoApi([
+    'login' => 'demoDelivery',
+    'password' => 'PI1yFaKFCGvvJKi'
+]);
+
+echo $iikoApi->accessToken;
 ```
 
 ## Change log
