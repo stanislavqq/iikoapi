@@ -11,4 +11,9 @@ class ExampleTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertTrue(true);
     }
+
+    public function test()
+    {
+
+    }
 }
