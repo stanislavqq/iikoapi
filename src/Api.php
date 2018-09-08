@@ -82,7 +82,10 @@ class Api
      */
     public function createProduct()
     {
-        return new Product($this->getGUID());
+        $product = new \stdClass();
+        $product->id = $this->getGUID();
+
+        return new Product($product);
     }
 
     /**
