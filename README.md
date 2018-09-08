@@ -2,26 +2,10 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
-[![Build Status][ico-travis]][link-travis]
-[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
-[![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what
-PSRs you support to avoid any confusion with users and contributors.
-
-## Structure
-
-If any of the following are applicable to your project, then the directory structure should follow industry best practices by being named the following.
-
-```
-bin/        
-config/
-src/
-tests/
-vendor/
-```
-
+PHP Библеотека для работы с iiko.biz api.
+В разработке. Документация будет регулярно дополняться и обновляться.  
 
 ## Install
 
@@ -32,27 +16,59 @@ $ composer require --dev stanislavqq/iikoapi
 ```
 
 ## Usage
-
+Инифиализация и получение токена для работы с api.
 ``` php
-use stanislavqq\iikoapi\IikoApi;
+use stanislavqq\iikoapi\Api;
 
-$iikoApi = new IikoApi([
+$iiko = new Api([
     'login' => 'demoDelivery',
     'password' => 'PI1yFaKFCGvvJKi'
 ]);
 
-echo $iikoApi->accessToken;
+echo $iiko->accessToken;
 ```
 
+### Получить организации
+Создание обьекта класса Organization: 
+```
+use stanislavqq\iikoapi\Organization; 
+
+$orgList = $iiko->getOrganizationList();
+$organization = new Organization($orgList[0]);
+
+echo $organization->id;
+echo $organization->name;
+<...>
+```
+
+### Получить меню:
+```
+<...>
+$organization = new Organization($orgList[0]);
+
+$iiko->setOrganization($organization);
+$menu = $iiko->getNomenclature(); //Вернет массив обьектов класса Product
+
+foreach($menu as $product) {
+    echo $product->name;
+}
+```
+
+### Создание заказа
+```
+<...>
+
+$product = $iiko->createProduct();
+$product->name = 'Паста по-итальянски';
+
+$order = $iiko->createOrder();
+$order->setProduct($product);
+```
+Метод setProduct клааса Order принимает обьект класса Product `$order->setProduct($product);`
+Так же есть метод для добавления множества товаров `$order->setProducts(array $products);` 
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
-## Testing
-
-``` bash
-$ composer test
-```
 
 ## Contributing
 
@@ -73,7 +89,6 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [ico-version]: https://img.shields.io/packagist/v/stanislavqq/iikoapi.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/stanislavqq/iikoapi/master.svg?style=flat-square
 [ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/stanislavqq/iikoapi.svg?style=flat-square
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/stanislavqq/iikoapi.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/stanislavqq/iikoapi.svg?style=flat-square
