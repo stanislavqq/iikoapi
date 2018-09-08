@@ -3,6 +3,8 @@
 namespace stanislavqq\iikoapi;
 
 use \GuzzleHttp\Client;
+use Exception;
+use Throwable;
 
 class Api
 {
@@ -169,23 +171,37 @@ class Api
         $this->organization = $organization;
     }
 
+    /**
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function getNomenclature()
     {
-        if (!is_null($this->organization)) {
-
-            $orgId = $this->organization->id;
-
-            $params = [
-                'access_token' => $this->accessToken,
-                'organizationId' => $orgId
-            ];
-
-            $res = $this->client->request('get', 'nomenclature/' . $orgId . '?' . http_build_query($params));
-            $json = json_decode((string)$res->getBody());
-            return $json->products;
+        if (is_null($this->organization)) {
+            throw new Exception('Для получения продукции необходимы данные о организации. Используйте Api->setOrganization(Organization $organization)');
         }
 
-        return false;
+        $orgId = $this->organization->id;
+
+        $params = [
+            'access_token' => $this->accessToken,
+            'organizationId' => $orgId
+        ];
+
+        $res = $this->client->request('get', 'nomenclature/' . $orgId . '?' . http_build_query($params));
+        $json = json_decode((string)$res->getBody());
+
+        $products = [];
+
+        if (isset($json->products)) {
+            foreach ($json->products as $product) {
+                $products[] = new Product($product);
+            }
+
+            return $products;
+        }
+
+
     }
 
     public function sendOrder(Order $order)
@@ -214,14 +230,14 @@ class Api
                 'phone' => $order->phone,
                 'isSelfService' => $order->isSelfService,
                 'items' => $productsItems,
-                'address' => (array) $order->address
+                'address' => (array)$order->address
             ],
         ];
 //
 //        pre($postParams);
 //        die();
 
-        $postParams = (array) json_decode("{
+        $postParams = (array)json_decode("{
   \"organization\": \"e464c693-4a57-11e5-80c1-d8d385655247\",
   \"customer\": {
     \"id\": \"94ba8ebb-8e43-7a1f-d4a8-190ed5a0c457\",
@@ -325,7 +341,8 @@ class Api
         return (string)$res->getBody();
     }
 
-    public function prepareProducts($products)
+    public
+    function prepareProducts($products)
     {
         $productsItems = [];
         foreach ($products as $product) {
