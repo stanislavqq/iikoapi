@@ -4,7 +4,7 @@ namespace stanislavqq\iikoapi;
 
 use \GuzzleHttp\Client;
 
-class IikoApi
+class Api
 {
     private $login;
     private $password;
