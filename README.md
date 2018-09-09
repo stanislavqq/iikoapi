@@ -30,7 +30,7 @@ echo $iiko->accessToken;
 
 ### Получить организации
 Создание обьекта класса Organization: 
-```
+``` php
 use stanislavqq\iikoapi\Organization; 
 
 $orgList = $iiko->getOrganizationList();
@@ -38,12 +38,10 @@ $organization = new Organization($orgList[0]);
 
 echo $organization->id;
 echo $organization->name;
-<...>
 ```
 
 ### Получить меню:
-```
-<...>
+``` php
 $organization = new Organization($orgList[0]);
 
 $iiko->setOrganization($organization);
@@ -55,8 +53,7 @@ foreach($menu as $product) {
 ```
 
 ### Создание заказа
-```
-<...>
+``` php 
 
 $product = $iiko->createProduct();
 $product->name = 'Паста по-итальянски';
