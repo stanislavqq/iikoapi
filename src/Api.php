@@ -143,8 +143,9 @@ class Api
      * @param object $object
      * @return bool|Organization
      */
-    public function createOrganization(object $object, $setOrgAfterCreate = false)
+    public function createOrganization($object, $setOrgAfterCreate = false)
     {
+
         if (isset($object->id)) {
             $organization = new Organization($object->id);
             $organization->isActive = $object->isActive;
