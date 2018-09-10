@@ -10,9 +10,9 @@ PHP Библеотека для работы с iiko.biz api.
 ## Install
 
 Via Composer
-For dev
+
 ``` bash
-$ composer require --dev stanislavqq/iikoapi
+$ composer require stanislavqq/iikoapi
 ```
 
 ## Usage
