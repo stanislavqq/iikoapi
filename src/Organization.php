@@ -32,31 +32,9 @@ class Organization
     public $website;
     public $workTime;
 
-    public function __construct($object)
+    public function __construct($id)
     {
-        $this->id = $object->id;
-        $this->name = $object->name;
-        $this->phone = $object->phone;
-        $this->isActive = $object->isActive;
-        $this->description = $object->description;
-        $this->address = $object->address;
-
-        $this->averageCheque = $object->averageCheque;
-        $this->contact = $object->contact;
-        $this->currencyIsoName = $object->currencyIsoName;
-        $this->homePage = $object->homePage;
-        $this->latitude = $object->latitude;
-        $this->logo = $object->logo;
-        $this->logoImage = $object->logoImage;
-        $this->longitude = $object->longitude;
-        $this->maxBonus = $object->maxBonus;
-        $this->minBonus = $object->minBonus;
-        $this->networkId = $object->networkId;
-        $this->organizationType = $object->organizationType;
-        $this->timezone = $object->timezone;
-        $this->website = $object->website;
-        $this->workTime = $object->workTime;
-
+        $this->id = $id;
     }
 
     public function getMenu()
@@ -77,5 +55,9 @@ class Organization
         }
 
         return $this;
+    }
+
+    public function isValid() {
+
     }
 }

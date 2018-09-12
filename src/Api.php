@@ -82,12 +82,15 @@ class Api
     /**
      * @return Product
      */
-    public function createProduct()
+    public function createProduct($id = null, $properties = [])
     {
-        $product = new \stdClass();
-        $product->id = $this->getGUID();
+        $pid = !is_null($id) ? $id : $this->getGUID();
+        $product = new Product($pid);
+        if ($properties) {
+            $product->setData($properties);
+        }
 
-        return new Product($product);
+        return $product;
     }
 
     /**
@@ -143,24 +146,13 @@ class Api
      * @param object $object
      * @return bool|Organization
      */
-    public function createOrganization(object $object, $setOrgAfterCreate = false)
+    public function createOrganization($id = null)
     {
-        if (isset($object->id)) {
-            $organization = new Organization($object->id);
-            $organization->isActive = $object->isActive;
-            $organization->description = $object->description;
-            $organization->phone = $object->contact->phone;
-            $organization->email = $object->contact->email;
-            $organization->name = $object->name;
+        $gid = !is_null($id) ? $id : $this->getGUID();
+        $organization = new Organization($gid);
+        $this->setOrganization($organization);
 
-            if ($setOrgAfterCreate === true) {
-                $this->setOrganization($organization);
-            }
-
-            return $organization;
-        }
-
-        return false;
+        return $this->organization;
     }
 
     /**
@@ -169,6 +161,47 @@ class Api
     public function setOrganization(Organization $organization)
     {
         $this->organization = $organization;
+    }
+
+    /**
+     * @return mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getPaymentTypes()
+    {
+
+        $params = [
+            'access_token' => $this->accessToken,
+            'organization' => $this->organization->id
+        ];
+
+        $res = $this->client->request('get', 'rmsSettings/getPaymentTypes?' . http_build_query($params));
+        $json = json_decode((string)$res->getBody());
+
+        $payments = [];
+
+        if (isset($json->paymentTypes)) {
+            foreach ($json->paymentTypes as $paymentType) {
+                $payment = $this->createPayment($paymentType->id, [
+                    'code' => $paymentType->code,
+                    'name' => $paymentType->name,
+                    'comment' => $paymentType->comment,
+                    'combinable' => $paymentType->combinable,
+                    'externalRevision' => $paymentType->externalRevision,
+                    'applicableMarketingCampaigns' => $paymentType->applicableMarketingCampaigns,
+                    'deleted' => $paymentType->deleted,
+                ]);
+
+                $payments[] = $payment;
+            }
+        }
+
+        return $payments;
+    }
+
+    public function createPayment($id, $data = [])
+    {
+        return new Payment($id, $data);
     }
 
     /**
@@ -195,7 +228,23 @@ class Api
 
         if (isset($json->products)) {
             foreach ($json->products as $product) {
-                $products[] = new Product($product);
+                $productItem = $this->createProduct($product->id, [
+                    'code' => $product->code,
+                    'name' => $product->name,
+                    'carbohydrateAmount' => $product->carbohydrateAmount,
+                    'carbohydrateFullAmount' => $product->carbohydrateFullAmount,
+                    'energyAmount' => $product->energyAmount,
+                    'energyFullAmount' => $product->energyFullAmount,
+                    'fatAmount' => $product->fatAmount,
+                    'fatFullAmount' => $product->fatFullAmount,
+                    'fiberAmount' => $product->fiberAmount,
+                    'fiberFullAmount' => $product->fiberFullAmount,
+                    'groupId' => $product->groupId,
+                    'order' => $product->order,
+                    'price' => $product->price,
+                ]);
+
+                $products[] = $productItem;
             }
 
             return $products;
@@ -206,12 +255,12 @@ class Api
 
     public function sendOrder(Order $order)
     {
-        if (empty($order->products)) {
-            throw new \Exeption('Property "products" of class Order can\'t be empty!');
+        if ($this->validateOrder($order) != true) {
+            throw new Exception('Order data is not valid');
         }
 
-        if (empty($order->customer)) {
-            throw new \Exeption('Property "customer" of class Order can\'t be empty!');
+        if ($this->validateCustomer($order->customer) != true) {
+            throw new Exception('Customer data is not valid');
         }
 
         $productsItems = $this->prepareProducts($order->products);
@@ -230,109 +279,9 @@ class Api
                 'phone' => $order->phone,
                 'isSelfService' => $order->isSelfService,
                 'items' => $productsItems,
-                'address' => (array)$order->address
+                'address' => $order->address
             ],
         ];
-//
-//        pre($postParams);
-//        die();
-
-        $postParams = (array)json_decode("{
-  \"organization\": \"e464c693-4a57-11e5-80c1-d8d385655247\",
-  \"customer\": {
-    \"id\": \"94ba8ebb-8e43-7a1f-d4a8-190ed5a0c457\",
-    \"name\": \"Иван\",
-    \"phone\": \"71235678901\"
-  },
-  \"order\": {
-    \"id\": \"582566d1-a121-0fb1-4d97-46ab77012b56\",
-    \"date\": \"2018-09-02 18:56:20\",
-    \"phone\": \"71235678901\",
-    \"isSelfService\": \"false\",
-    \"items\": [
-      {
-        \"id\": \"8b6acd19-e9c5-479d-8d98-09a434869b1a\",
-        \"name\": \"7 UP\",
-        \"amount\": 1,
-        \"code\": \"0026\",
-        \"sum\": 90
-      },
-      {
-        \"id\": \"75c14ee6-bccd-4f52-8410-3806a9d592dd\",
-        \"name\": \"Паста с говядиной\",
-        \"amount\": 2,
-        \"code\": \"0003\",
-        \"sum\": 200
-      },
-      {
-        \"id\": \"8842b207-1546-483b-945a-5eed6279139d\",
-        \"name\": \"Салат из свежих помидоров и огурцов\",
-        \"amount\": 3,
-        \"code\": \"0029\",
-        \"sum\": 420
-      },
-      {
-        \"id\": \"e42a4866-9a06-4ad6-b341-76e06e0dc882\",
-        \"name\": \"Укроп\",
-        \"amount\": 4,
-        \"code\": \"0016\",
-        \"sum\": 52
-      },
-      {
-        \"id\": \"03190633-77b4-4d02-b3bb-e5d691faf29d\",
-        \"name\": \"Сидр\",
-        \"amount\": 3,
-        \"code\": \"0006\",
-        \"sum\": 936
-      },
-      {
-        \"id\": \"4837993d-9194-4dd1-80a4-27296c283cad\",
-        \"name\": \"Борщ\",
-        \"amount\": 3,
-        \"code\": \"00030\",
-        \"sum\": 240
-      },
-      {
-        \"id\": \"a44dcab4-89ef-469a-8299-6f71e8838e0a\",
-        \"name\": \"Солянка\",
-        \"amount\": 4,
-        \"code\": \"0001\",
-        \"sum\": 320
-      },
-      {
-        \"id\": \"846bbcb7-13bd-4e82-bfc4-80958a68918e\",
-        \"name\": \"Салат Коул-слоу\",
-        \"amount\": 1,
-        \"code\": \"0027\",
-        \"sum\": 100
-      },
-      {
-        \"id\": \"72472e5b-7946-4b2f-ab1f-fa47d096e464\",
-        \"name\": \"Сыр\",
-        \"amount\": 1,
-        \"code\": \"0014\",
-        \"sum\": 45
-      },
-      {
-        \"id\": \"39940018-2cc3-4bd1-8bf2-1371177fdd24\",
-        \"name\": \"Манты\",
-        \"amount\": 4,
-        \"code\": \"0019\",
-        \"sum\": 880
-      }
-    ],
-    \"address\": {
-      \"city\": \"Москва\",
-      \"street\": \"Красная площадь\",
-      \"home\": \"1\",
-      \"housing\": \"\",
-      \"apartment\": \"14\",
-      \"comment\": \"Комментарий к заказу\"
-    }
-  }
-}");
-//        pre($postParams);
-//        die();
 
         $res = $this->client->request('post', 'orders/add?' . http_build_query($params), [
             'form_params' => $postParams
@@ -341,17 +290,69 @@ class Api
         return (string)$res->getBody();
     }
 
-    public
-    function prepareProducts($products)
+    public function prepareProducts($products)
     {
         $productsItems = [];
         foreach ($products as $product) {
             if ($product instanceof Product) {
-                $productsItems[] = (array)$product;
+                $productsItems[] = [
+                    'id' => $product->id,
+                    'amount' => $product->amount,
+                    'sum' => $product->price,
+                    'name' => $product->name
+                ];
             }
         }
 
         return $productsItems;
+    }
+
+    protected function validateCustomer(Customer $customer)
+    {
+        if (is_null($customer->phone) || $customer->phone == '') {
+            throw new Exception('Customer->phone is not set!');
+        }
+
+        if (is_null($customer->name) || $customer->name == '') {
+            throw new Exception('Customer->phone is not set!');
+        }
+
+        return true;
+    }
+
+    protected function validateOrder(Order $order)
+    {
+
+        if (is_null($order->date)) {
+            throw new Exception('Order->date is not set!');
+        }
+
+        if (is_null($order->phone) || $order->phone == '') {
+            throw new Exception('Order->phone is not set!');
+        }
+
+        if (is_null($order->address)) {
+            throw new Exception('Order->address is not set!');
+        }
+
+        if (!is_array($order->address)) {
+            throw new Exception('Order->address should be a array');
+        }
+
+        if (!is_array($order->products) && empty($order->productsItems)) {
+            throw new Exception('Order->products is not set!');
+        }
+
+        if (is_null($order->isSelfService)) {
+            throw new Exception('Order->isSelfService is not set!');
+        }
+
+        return true;
+    }
+
+    protected function validateProduct(Product $product)
+    {
+
     }
 
 }

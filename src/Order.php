@@ -11,6 +11,7 @@ class Order
     public $isSelfService = 'false';
     public $customer;
     public $products = [];
+    public $payment;
     public $address = [
         "city" => "",
         "street" => "",
@@ -36,6 +37,13 @@ class Order
     public function setProduct(Product $product)
     {
         array_push($this->products, $product);
+        return $this;
+    }
+
+    public function setPayment(Payment $payment)
+    {
+        $this->payment = $payment;
+        return $this;
     }
 
     /**
@@ -46,11 +54,13 @@ class Order
         foreach ($products as $key => $product) {
             $this->setProduct($product);
         }
+        return $this;
     }
 
     public function setCustomer(Customer $customer)
     {
         $this->customer = $customer;
+        return $this;
     }
 
     /**
