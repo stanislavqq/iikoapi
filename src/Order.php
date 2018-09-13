@@ -10,6 +10,7 @@ class Order
     public $phone;
     public $isSelfService = 'false';
     public $customer;
+    public $comment;
     public $products = [];
     public $payment;
     public $address = [
@@ -90,6 +91,10 @@ class Order
      */
     public function setComment($comment)
     {
+        $this->comment = (string)$comment;
+    }
+
+    public function setCommentAddress($comment) {
         $this->address['comment'] = (string)$comment;
     }
 }
