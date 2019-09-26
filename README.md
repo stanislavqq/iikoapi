@@ -16,7 +16,7 @@ $ composer require stanislavqq/iikoapi
 ```
 
 ## Usage
-Инифиализация и получение токена для работы с api.
+Инициализация и получение токена для работы с api.
 ``` php
 use stanislavqq\iikoapi\Api;
 
