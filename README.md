@@ -4,7 +4,7 @@
 [![Software License][ico-license]](LICENSE.md)
 [![Total Downloads][ico-downloads]][link-downloads]
 
-PHP Библеотека для работы с iiko.biz api.
+PHP Библиотека для работы с iiko.biz api.
 В разработке. Документация будет регулярно дополняться и обновляться.  
 
 ## Install
