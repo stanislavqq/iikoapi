@@ -25,7 +25,7 @@ $iiko = new Api([
     'password' => 'PI1yFaKFCGvvJKi'
 ]);
 
-echo $iiko->accessToken;
+echo $iiko->getToken();
 ```
 
 ### Получить организации
