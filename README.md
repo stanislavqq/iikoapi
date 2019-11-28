@@ -12,7 +12,7 @@ PHP Библиотека для работы с iiko.biz api.
 Via Composer
 
 ``` bash
-$ composer require stanislavqq/iikoapi
+$ composer require stanislavqq/iikoapi v1.0.5-beta
 ```
 
 ## Usage
