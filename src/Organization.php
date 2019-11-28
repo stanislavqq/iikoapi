@@ -32,9 +32,13 @@ class Organization
     public $website;
     public $workTime;
 
-    public function __construct($object)
+    public function __construct(string $id)
     {
-        $this->id = $object->id;
+        $this->id = $id;
+    }
+
+    public function setData($object)
+    {
         $this->name = $object->name;
         $this->phone = $object->phone;
         $this->isActive = $object->isActive;
@@ -56,7 +60,6 @@ class Organization
         $this->timezone = $object->timezone;
         $this->website = $object->website;
         $this->workTime = $object->workTime;
-
     }
 
     public function getMenu()

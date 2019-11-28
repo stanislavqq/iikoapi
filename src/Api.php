@@ -5,6 +5,7 @@ namespace stanislavqq\iikoapi;
 use \GuzzleHttp\Client;
 use Exception;
 use Throwable;
+use stanislavqq\iikoapi\Order;
 
 class Api
 {
@@ -174,7 +175,7 @@ class Api
 
     /**
      * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws Exception
      */
     public function getNomenclature()
     {
@@ -201,18 +202,21 @@ class Api
 
             return $products;
         }
-
-
     }
 
+    /**
+     * @param \stanislavqq\iikoapi\Order $order
+     * @return string
+     * @throws Exception
+     */
     public function sendOrder(Order $order)
     {
         if (empty($order->products)) {
-            throw new \Exeption('Property "products" of class Order can\'t be empty!');
+            throw new Exception('Property "products" of class Order can\'t be empty!');
         }
 
         if (empty($order->customer)) {
-            throw new \Exeption('Property "customer" of class Order can\'t be empty!');
+            throw new Exception('Property "customer" of class Order can\'t be empty!');
         }
 
         $productsItems = $this->prepareProducts($order->products);
@@ -234,106 +238,6 @@ class Api
                 'address' => (array)$order->address
             ],
         ];
-//
-//        pre($postParams);
-//        die();
-
-        $postParams = (array)json_decode("{
-  \"organization\": \"e464c693-4a57-11e5-80c1-d8d385655247\",
-  \"customer\": {
-    \"id\": \"94ba8ebb-8e43-7a1f-d4a8-190ed5a0c457\",
-    \"name\": \"Иван\",
-    \"phone\": \"71235678901\"
-  },
-  \"order\": {
-    \"id\": \"582566d1-a121-0fb1-4d97-46ab77012b56\",
-    \"date\": \"2018-09-02 18:56:20\",
-    \"phone\": \"71235678901\",
-    \"isSelfService\": \"false\",
-    \"items\": [
-      {
-        \"id\": \"8b6acd19-e9c5-479d-8d98-09a434869b1a\",
-        \"name\": \"7 UP\",
-        \"amount\": 1,
-        \"code\": \"0026\",
-        \"sum\": 90
-      },
-      {
-        \"id\": \"75c14ee6-bccd-4f52-8410-3806a9d592dd\",
-        \"name\": \"Паста с говядиной\",
-        \"amount\": 2,
-        \"code\": \"0003\",
-        \"sum\": 200
-      },
-      {
-        \"id\": \"8842b207-1546-483b-945a-5eed6279139d\",
-        \"name\": \"Салат из свежих помидоров и огурцов\",
-        \"amount\": 3,
-        \"code\": \"0029\",
-        \"sum\": 420
-      },
-      {
-        \"id\": \"e42a4866-9a06-4ad6-b341-76e06e0dc882\",
-        \"name\": \"Укроп\",
-        \"amount\": 4,
-        \"code\": \"0016\",
-        \"sum\": 52
-      },
-      {
-        \"id\": \"03190633-77b4-4d02-b3bb-e5d691faf29d\",
-        \"name\": \"Сидр\",
-        \"amount\": 3,
-        \"code\": \"0006\",
-        \"sum\": 936
-      },
-      {
-        \"id\": \"4837993d-9194-4dd1-80a4-27296c283cad\",
-        \"name\": \"Борщ\",
-        \"amount\": 3,
-        \"code\": \"00030\",
-        \"sum\": 240
-      },
-      {
-        \"id\": \"a44dcab4-89ef-469a-8299-6f71e8838e0a\",
-        \"name\": \"Солянка\",
-        \"amount\": 4,
-        \"code\": \"0001\",
-        \"sum\": 320
-      },
-      {
-        \"id\": \"846bbcb7-13bd-4e82-bfc4-80958a68918e\",
-        \"name\": \"Салат Коул-слоу\",
-        \"amount\": 1,
-        \"code\": \"0027\",
-        \"sum\": 100
-      },
-      {
-        \"id\": \"72472e5b-7946-4b2f-ab1f-fa47d096e464\",
-        \"name\": \"Сыр\",
-        \"amount\": 1,
-        \"code\": \"0014\",
-        \"sum\": 45
-      },
-      {
-        \"id\": \"39940018-2cc3-4bd1-8bf2-1371177fdd24\",
-        \"name\": \"Манты\",
-        \"amount\": 4,
-        \"code\": \"0019\",
-        \"sum\": 880
-      }
-    ],
-    \"address\": {
-      \"city\": \"Москва\",
-      \"street\": \"Красная площадь\",
-      \"home\": \"1\",
-      \"housing\": \"\",
-      \"apartment\": \"14\",
-      \"comment\": \"Комментарий к заказу\"
-    }
-  }
-}");
-//        pre($postParams);
-//        die();
 
         $res = $this->client->request('post', 'orders/add?' . http_build_query($params), [
             'form_params' => $postParams
@@ -342,8 +246,7 @@ class Api
         return (string)$res->getBody();
     }
 
-    public
-    function prepareProducts($products)
+    public function prepareProducts($products)
     {
         $productsItems = [];
         foreach ($products as $product) {
