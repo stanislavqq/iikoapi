@@ -9,6 +9,11 @@ PHP Библиотека для работы с iiko.biz api.
 Эта библиотека представлена скорее как пример, чем завершенный продукт.
 
 
+PHP Library for working with iiko.biz api. 
+Not recommended for use on real projects. 
+This library is presented as an example rather than a complete product.
+
+
 ## Install
 
 Via Composer
